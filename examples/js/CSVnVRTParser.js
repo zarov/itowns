@@ -7,6 +7,22 @@
  * the [xsd
  * schema](https://github.com/OSGeo/gdal/blob/master/gdal/data/ogrvrt.xsd) of
  * the OGR VRT file.
+ *
+ * @example
+ * Fetcher.multi('data', {
+ *     xml: ['vrt'],
+ *     text: ['csv']
+ * }).then(function _(res) {
+ *     return CSVnVRTParser.parse(res, {
+ *         buildExtent: true,
+ *         crsOut: 'EPSG:4326'
+ *     });
+ * }).then(function _(feature) {
+ *     var source = new itowns.FileSource({ parsedData: feature });
+ *     var layer = new itowns.ColorLayer('CSVnVRT', { source });
+ *     view.addLayer(layer);
+ * });
+ *
  * @module CSVnVRTParser
  */
 var CSVnVRTParser = (function _() {
@@ -20,30 +36,40 @@ var CSVnVRTParser = (function _() {
 
         return {
             header: lines.shift(),
-            data: lines
+            content: lines
         };
     }
 
     function xml2json(xml, json) {
-        var name = xml.nodeName;
-        json[name] = {};
-
+        var res = {};
 
         var attributes = xml.getAttributeNames();
         if (attributes.length > 0) {
-            json[name].attributes = {};
+            res.attributes = {};
             for (var i = 0; i < attributes.length; i++) {
-                json[name].attributes[attributes[i]] = xml.getAttributeNode(attributes[i]).value;
+                res.attributes[attributes[i]] = xml.getAttributeNode(attributes[i]).value;
             }
         }
 
         if (xml.childElementCount > 0) {
             for (var i = 0; i < xml.childElementCount; i++) {
-                xml2json(xml.children[i], json[name]);
+                xml2json(xml.children[i], res);
             }
         } else if (xml.textContent) {
-            json[name].value = xml.textContent;
+            res.value = xml.textContent;
         }
+
+        var name = xml.nodeName;
+
+        if (!json[name]) {
+            json[name] = res;
+        } else if (json[name].length > 0) {
+            json[name].push(res);
+        } else {
+            json[name] = [res];
+        }
+
+        return json;
     }
 
     function getGeometryType(type) {
@@ -63,28 +89,44 @@ var CSVnVRTParser = (function _() {
         }
     }
 
-    function OGRVRTLayer2Feature(json, layer, srs, options) {
-        var crs = (layer.LayerSRS && layer.LayerSRS.value) || srs;
+    function OGRVRTLayer2Feature(layer, data, crs, options) {
+        var crs = (layer.LayerSRS && layer.LayerSRS.value) || crs;
 
         var type = itowns.FEATURE_TYPES.POINT;
         if (layer.GeometryType) {
             type = getGeometryType(layer.GeometryType.value);
         }
 
-        var feature = new itowns.Feature(itowns.FEATURE_TYPES.POINT, options.crsOut, options);
+        var feature = new itowns.Feature(type, options.crsOut, options);
+
+        if (layer.Field) {
+            if (!layer.Field.length) {
+                layer.Field = [layer.Field];
+            }
+
+            for (var f = 0; f < layer.Field.length; f++) {
+                layer.Field[f].attributes.pos = data.header.indexOf(layer.Field[f].attributes.src);
+            }
+        }
 
         if (layer.GeometryField) {
             switch (layer.GeometryField.attributes.encoding) {
                 case 'PointFromColumns':
-                    var x = json.header.indexOf(layer.GeometryField.attributes.x);
-                    var y = json.header.indexOf(layer.GeometryField.attributes.y);
-                    var z = json.header.indexOf(layer.GeometryField.attributes.z);
-                    var m = json.header.indexOf(layer.GeometryField.attributes.m);
+                    var x = data.header.indexOf(layer.GeometryField.attributes.x);
+                    var y = data.header.indexOf(layer.GeometryField.attributes.y);
+                    var z = data.header.indexOf(layer.GeometryField.attributes.z);
+                    var m = data.header.indexOf(layer.GeometryField.attributes.m);
 
                     var line;
-                    for (var i = 0; i < json.data.length; i++) {
-                        line = json.data[i];
+                    for (var i = 0; i < data.content.length; i++) {
+                        line = data.content[i];
                         var geometry = feature.bindNewGeometry();
+
+                        if (layer.Field) {
+                            for (var f = 0; f < layer.Field.length; f++) {
+                                geometry.properties[layer.Field[f].attributes.name] = line[layer.Field[f].attributes.pos];
+                            }
+                        }
 
                         geometry.startSubGeometry(1);
                         coord.crs = (layer.GeometryField.SRS && layer.GeometryField.SRS.value) || crs;
@@ -107,26 +149,51 @@ var CSVnVRTParser = (function _() {
         return feature;
     }
 
+    function OGRVRTWarpedLayer2Feature(layer, data, options, crs) {
+        throw new Error('not supported yet');
+    }
+
+    function OGRVRTUnionLayer2Feature(layer, data, options, crs) {
+        throw new Error('not supported yet');
+    }
+
+    function readLayer(layer, data, options, crs) {
+        if (layer.OGRVRTLayer) {
+            var collection = new itowns.FeatureCollection(options.crsOut, options)
+            var feature = OGRVRTLayer2Feature(layer.OGRVRTLayer, data, layer.TargetSRS.value, options);
+            collection.pushFeature(feature);
+            return collection;
+        } else if (layer.OGRVRTWarpedLayer) {
+            return OGRVRTWarpedLayer2Feature(layer, data, options, crs);
+        } else if (layer.OGRVRTUnionLayer) {
+            return OGRVRTUnionLayer2Feature(layer, data, options, crs);
+        }
+    }
+
     return {
+        /**
+         * Parse a CSV associated to a VRT and return a {@link
+         * FeatureCollection}.
+         *
+         * @param {Object} data - The data needed.
+         * @param {string} data.csv - Data from the CSV, with values separated
+         * by comma, semicolon or tabulation.
+         * @param {Document} data.vrt - The OGR VRT file, describing the CSV.
+         * @param {geojsonParserOptions} [options]
+         *
+         * @return {Promise} A promise resolving with a [FeatureCollection]{@link
+         * module:GeoJsonParser~FeatureCollection}.
+         *
+         * @memberof module:CSVnVRTParser
+         */
         parse: function _(data, options) {
             if (!data.csv || !data.vrt) {
                 throw new Error('Missing files when parsing');
             }
             var json = csv2json(data.csv);
+            var schema = xml2json(data.vrt.children[0], {});
 
-            var schema = {};
-            xml2json(data.vrt.children[0], schema);
-
-            var collection;
-            if (schema.OGRVRTDataSource.OGRVRTLayer) {
-                collection = new itowns.FeatureCollection(options.crsOut, options)
-                var feature = OGRVRTLayer2Feature(json, schema.OGRVRTDataSource.OGRVRTLayer, schema.OGRVRTDataSource.TargetSRS.value, options);
-                collection.pushFeature(feature);
-            } else if (schema.OGRVRTDataSource.OGRVRTWarpedLayer) {
-                throw new Error('not supported yet');
-            } else if (schema.OGRVRTDataSource.OGRVRTUnionLayer) {
-                throw new Error('not supported yet');
-            }
+            var collection = readLayer(schema.OGRVRTDataSource, json, options);
 
             console.log(collection);
 
