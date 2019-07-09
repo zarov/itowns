@@ -1,4 +1,4 @@
-/* global itowns, Promise, THREE */
+/* global itowns, Promise */
 
 /**
  * A module to parse OGR Virtual Format files.
@@ -36,60 +36,17 @@ var CSVnVRTParser = (function _() {
 
         return {
             header: lines.shift(),
-            content: lines
+            content: lines,
         };
     }
 
-    function xml2json(xml, json) {
-        var res = {};
 
-        var attributes = xml.getAttributeNames();
-        if (attributes.length > 0) {
-            res.attributes = {};
-            for (var i = 0; i < attributes.length; i++) {
-                res.attributes[attributes[i]] = xml.getAttributeNode(attributes[i]).value;
-            }
-        }
-
-        if (xml.childElementCount > 0) {
-            for (var i = 0; i < xml.childElementCount; i++) {
-                xml2json(xml.children[i], res);
-            }
-        } else if (xml.textContent) {
-            res.value = xml.textContent;
-        }
-
-        var name = xml.nodeName;
-
-        if (!json[name]) {
-            json[name] = res;
-        } else if (json[name].length > 0) {
-            json[name].push(res);
-        } else {
-            json[name] = [res];
-        }
-
-        return json;
-    }
-
-    function getGeometryType(type) {
-        switch (type) {
-            case 'wkbPoint':
-            case 'wkbMultiPoint':
-                return itowns.FEATURE_TYPES.POINT;
-            case 'wkbLineString':
-            case 'wkbMultiLineString':
-                return itowns.FEATURE_TYPES.LINE;
-            case 'wkbPolygon':
-            case 'wkbMultiPolygon':
-                return itowns.FEATURE_TYPES.POLYGON;
-            default:
-                throw new Error('This type of GeometryType is not supported yet: ' + type);
-                break;
-        }
-    }
 
     function OGRVRTLayer2Feature(layer, data, crs, options) {
+        var collection = new itowns.FeatureCollection(options.crsOut, options);
+        var feature = OGRVRTLayer2Feature(layer.OGRVRTLayer, data, layer.TargetSRS.value, options);
+        collection.pushFeature(feature);
+
         var crs = (layer.LayerSRS && layer.LayerSRS.value) || crs;
 
         var type = itowns.FEATURE_TYPES.POINT;
@@ -104,8 +61,8 @@ var CSVnVRTParser = (function _() {
                 layer.Field = [layer.Field];
             }
 
-            for (var f = 0; f < layer.Field.length; f++) {
-                layer.Field[f].attributes.pos = data.header.indexOf(layer.Field[f].attributes.src);
+            for (var i = 0; i < layer.Field.length; i++) {
+                layer.Field[i].attributes.pos = data.header.indexOf(layer.Field[i].attributes.src);
             }
         }
 
@@ -118,13 +75,13 @@ var CSVnVRTParser = (function _() {
                     var m = data.header.indexOf(layer.GeometryField.attributes.m);
 
                     var line;
-                    for (var i = 0; i < data.content.length; i++) {
-                        line = data.content[i];
+                    for (var j = 0; j < data.content.length; j++) {
+                        line = data.content[j];
                         var geometry = feature.bindNewGeometry();
 
                         if (layer.Field) {
-                            for (var f = 0; f < layer.Field.length; f++) {
-                                geometry.properties[layer.Field[f].attributes.name] = line[layer.Field[f].attributes.pos];
+                            for (var k = 0; k < layer.Field.length; k++) {
+                                geometry.properties[layer.Field[k].attributes.name] = line[layer.Field[k].attributes.pos];
                             }
                         }
 
@@ -142,31 +99,67 @@ var CSVnVRTParser = (function _() {
                     break;
                 default:
                     throw new Error('This type of encoding is not supported yet: ' + layer.GeometryField.attributes.encoding);
-                    break;
             }
         }
 
         return feature;
     }
 
-    function OGRVRTWarpedLayer2Feature(layer, data, options, crs) {
-        throw new Error('not supported yet');
+    // Convert an OGRVRTWarpedLayer to a Feature
+    function OGRVRTWarpedLayer2Feature(layer, data, options) {
+        var opts = Object.assign({}, options);
+
+        if (layer.SrcSRS) {
+            opts.crsIn = layer.SrcSRS.value;
+        }
+
+        if (layer.TargetSRS) {
+            opts.crsOut = layer.TargetSRS.value;
+        }
+
+        if (layer.ExtentXMin && layer.ExtentYMin && layer.ExtentXMax && layer.ExtentYMax) {
+            opts.buildExtent = false;
+            opts.extent = new itowns.Extent(opts.crsOut,
+                layer.ExtentXMin.value, layer.ExtentXMax.value,
+                layer.ExtentYMin.value, layer.ExtentYMax.value);
+        }
+
+        if (layer.WarpedGeomFieldName) {
+            console.warn('WarpedGeomFieldName is not supported yet');
+        }
+
+        return readLayer(layer, data, opts);
     }
 
-    function OGRVRTUnionLayer2Feature(layer, data, options, crs) {
-        throw new Error('not supported yet');
+    // Convert an OGRVRTUnionLayer to a Feature
+    function OGRVRTUnionLayer2Feature(layer, data, options) {
+        var opts = Object.assign({}, options);
+
+
+        if (layer.GeometryType) {
+            opts.type = getGeometryType(layer.GeometryType.value);
+        }
+
+        if (layer.LayerSRS) {
+            opts.crs
+        }
+
+        if (layer.ExtentXMin && layer.ExtentYMin && layer.ExtentXMax && layer.ExtentYMax) {
+            opts.buildExtent = false;
+            opts.extent = new itowns.Extent(opts.crsOut,
+                layer.ExtentXMin.value, layer.ExtentXMax.value,
+                layer.ExtentYMin.value, layer.ExtentYMax.value);
+        }
+
     }
 
-    function readLayer(layer, data, options, crs) {
+    function readLayer(layer, data, options) {
         if (layer.OGRVRTLayer) {
-            var collection = new itowns.FeatureCollection(options.crsOut, options)
-            var feature = OGRVRTLayer2Feature(layer.OGRVRTLayer, data, layer.TargetSRS.value, options);
-            collection.pushFeature(feature);
-            return collection;
+            return OGRVRTLayer2Feature(layer, data, options);
         } else if (layer.OGRVRTWarpedLayer) {
-            return OGRVRTWarpedLayer2Feature(layer, data, options, crs);
+            return OGRVRTWarpedLayer2Feature(layer, data, options);
         } else if (layer.OGRVRTUnionLayer) {
-            return OGRVRTUnionLayer2Feature(layer, data, options, crs);
+            return OGRVRTUnionLayer2Feature(layer, data, options);
         }
     }
 
@@ -194,8 +187,6 @@ var CSVnVRTParser = (function _() {
             var schema = xml2json(data.vrt.children[0], {});
 
             var collection = readLayer(schema.OGRVRTDataSource, json, options);
-
-            console.log(collection);
 
             return Promise.resolve(collection);
         },
