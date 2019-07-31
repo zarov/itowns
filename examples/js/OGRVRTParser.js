@@ -1,12 +1,27 @@
+/* global itowns */
+/**
+ * A module to parse OGR Virtual Format files.
+ *
+ * See the [GDAL documentation](https://gdal.org/drivers/vector/vrt.html) and
+ * the [xsd
+ * schema](https://github.com/OSGeo/gdal/blob/master/gdal/data/ogrvrt.xsd) of
+ * the OGR VRT file.
+ *
+ * @module OGRVRTParser
+ */
 var OGRVRTParser = (function () {
+    var Feature = itowns.Feature;
+    var FeatureCollection = itowns.FeatureCollection;
+    var FeatureGeometry = itowns.FeatureGeometry;
+
     function xml2json(xml, json) {
         var res = {};
 
         var attributes = xml.getAttributeNames();
         if (attributes.length > 0) {
-            res.attributes = {};
+            res['@attributes'] = {};
             for (var i = 0; i < attributes.length; i++) {
-                res.attributes[attributes[i]] = xml.getAttributeNode(attributes[i]).value;
+                res['@attributes'][attributes[i]] = xml.getAttributeNode(attributes[i]).value;
             }
         }
 
@@ -15,7 +30,7 @@ var OGRVRTParser = (function () {
                 xml2json(xml.children[j], res);
             }
         } else if (xml.textContent) {
-            res.value = xml.textContent;
+            res = xml.textContent;
         }
 
         var name = xml.nodeName;
@@ -44,6 +59,26 @@ var OGRVRTParser = (function () {
                 return itowns.FEATURE_TYPES.POLYGON;
             default:
                 throw new Error('This type of GeometryType is not supported yet: ' + type);
+        }
+    }
+
+    function getCrs(layer) {
+
+    }
+
+    /**
+     * Those elements are used to define the extent of the layer. This can be
+     * useful on static data, when getting the extent from the source layer is
+     * slow.
+     */
+    function getExtent(layer) {
+        if (layer.ExtentXMin != undefined
+            && layer.ExtentYMin != undefined
+            && layer.ExtentXMax != undefined
+            && layer.ExtentYMax != undefined) {
+                return new itowns.Extent(getCrs(layer),
+                    layer.ExtentXMin, layer.ExtentXMax,
+                    layer.ExtentYMin, layer.ExtentYMax);
         }
     }
 
@@ -120,6 +155,7 @@ var OGRVRTParser = (function () {
     }
 
     function readLayer(layer, target) {
+        console.log(layer);
         if (layer.OGRVRTLayer) {
             return readOGRVRTLayer(layer.OGRVRTLayer, target);
         } else if (layer.OGRVRTWarpedLayer) {
@@ -130,10 +166,11 @@ var OGRVRTParser = (function () {
     }
 
     return {
-        parse: function _(vrt, options) {
+        parse: function _(vrt, data, options) {
             var schema = xml2json(vrt.children[0], {});
 
-            var result = readLayer(schema.OGRVRTDataSource, {});
+            var result = readLayer(schema.OGRVRTDataSource, data);
+            console.log(data);
 
             return Promise.resolve(result);
         },

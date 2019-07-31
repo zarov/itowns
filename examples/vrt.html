@@ -7,15 +7,14 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="js/GUI/dat.gui/dat.gui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.0.1/papaparse.min.js"></script>
     </head>
     <body>
         <div id="viewerDiv"></div>
-        <script src="js/GUI/GuiTools.js"></script>
         <script src="../dist/itowns.js"></script>
         <script src="js/loading_screen.js"></script>
         <script src="js/FeatureToolTip.js"></script>
         <script src="js/OGRVRTParser.js"></script>
-        <script src="../dist/debug.js"></script>
         <script type="text/javascript">
             // Define initial camera position
             var positionOnGlobe = { longitude: 2.351323, latitude: 48.856712, altitude: 25000 };
@@ -25,7 +24,6 @@
 
             // Instanciate iTowns GlobeView*
             var view = new itowns.GlobeView(viewerDiv, positionOnGlobe);
-            var menuGlobe = new GuiTools('menuDiv', view);
             setupLoadingScreen(viewerDiv, view);
 
             // Add one imagery layer to the scene
@@ -34,14 +32,23 @@
             itowns.Fetcher.json('./layers/JSONLayers/OPENSM.json').then(function _(config) {
                 config.source = new itowns.TMSSource(config.source);
                 var layer = new itowns.ColorLayer('OPENSM', config);
-                view.addLayer(layer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
+                view.addLayer(layer);
             });
 
             // In this case, a VRT is associated to a CSV
-            itowns.Fetcher.xml('http://localhost/iTowns2-sample-data/vrt/velib-disponibilite-en-temps-reel.vrt')
-                .then(OGRVRTParser.parse)
+            itowns.Fetcher.multiple('http://raw.githubusercontent.com/iTowns/iTowns2-sample-data/master/vrt/velib-disponibilite-en-temps-reel',
+                {
+                    xml: ['vrt'],
+                    text: ['csv'],
+                })
+                .then(function _(res) {
+                    var csv = Papa.parse(res.csv.trim());
+                    return OGRVRTParser.parse(res.vrt, csv.data, {
+                        buildExtent: true,
+                        crsOut: view.tileLayer.extent.crs,
+                    });
+                })
                 .then(function _(feature) {
-                    console.log(feature);
 /*                    var velibSource = new itowns.FileSource({
                         parsedData: feature,
                     });
