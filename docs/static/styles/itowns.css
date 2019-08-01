@@ -16,8 +16,20 @@ html, body {
     position: absolute;
 }
 
+#main {
+    width: calc(100% - 330px);
+    height: 100%;
+    display: inline;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+
 #content {
-    width: 100%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: calc(100% - 330px);
 }
 
 section {
@@ -27,6 +39,7 @@ section {
 }
 
 nav {
+    width: 330px;
     padding: 0 2rem;
     overflow: auto;
 }

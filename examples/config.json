@@ -1,0 +1,47 @@
+{
+    "View": {
+        "Globe": "globe",
+        "Planar": "",
+        "Splitted rendering": "",
+        "Multiple globes": "",
+        "Planar on a cube": ""
+    },
+
+    "Source / Stream": {
+        "WMTS": "",
+        "WMS": "",
+        "WFS": "",
+        "TMS": ""
+    },
+
+    "Source / File": {
+        "Geojson": "",
+        "GPX": "",
+        "KML": "",
+        "Shapefile": "",
+        "TIFF": "",
+        "VectorTile": ""
+    },
+
+    "Source / Other": {
+        "3DTiles as a file": "",
+        "3DTiles as a stream": "",
+        "Pointcloud": "",
+        "3D model": ""
+    },
+
+    "Controls": {
+        "Globe controls": "",
+        "Planar controls": "",
+        "Planar controls in orthographic": "",
+        "First person controls": "",
+        "Camera animation": "",
+        "Synchronized views": ""
+    },
+
+    "Plugins": {
+        "Drag and drop": "",
+        "Stereo effects": "",
+        "Post processing": ""
+    }
+}
