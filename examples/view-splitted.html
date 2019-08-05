@@ -1,6 +1,10 @@
 <html>
     <head>
-        <title>Itowns - Split</title>
+        <title>Itowns - Split view</title>
+
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/example.css">
+        <link rel="stylesheet" type="text/css" href="css/LoadingScreen.css">
 
         <style type="text/css">
            #splitSlider {
@@ -16,19 +20,21 @@
                cursor: ew-resize;
            }
         </style>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="css/example.css">
-        <link rel="stylesheet" type="text/css" href="css/LoadingScreen.css">
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
+
+        <script src="js/GUI/LoadingScreen.js"></script>
+
+        <script src="../dist/itowns.js"></script>
     </head>
     <body>
+        <div id="description" class="text">This is the same view, but with two
+            layers that are rendered only on a half, using scissor
+            testing. This is done dynamically, as the slider in the middle can
+            be moved in real time.</div>
         <div id="viewerDiv"></div>
         <div id="splitSlider"></div>
 
-        <script src="../dist/itowns.js"></script>
-        <script src="js/GUI/LoadingScreen.js"></script>
         <script type="text/javascript">
             // # Simple Globe viewer
 

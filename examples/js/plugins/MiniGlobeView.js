@@ -1,13 +1,11 @@
-var MiniView = (function () {
-    var miniView;
-
+var MiniGlobeView = (function () {
     return {
         init(div, view, position) {
             var miniDiv = document.createElement('div');
             miniDiv.id = 'miniDiv';
             div.appendChild(miniDiv);
 
-            miniView = new itowns.GlobeView(miniDiv, position, {
+            var miniView = new itowns.GlobeView(miniDiv, position, {
                 // `limit globe' subdivision level:
                 // we're don't need a precise globe model
                 // since the mini globe will always be seen from a far point of view (see minDistance above)
@@ -22,12 +20,11 @@ var MiniView = (function () {
             // to see the main view "behind"
             miniView.mainLoop.gfxEngine.renderer.setClearColor(0x000000, 0);
 
-
             // update miniview's camera with the view's camera position
             view.addFrameRequester(itowns.MAIN_LOOP_EVENTS.AFTER_RENDER, function updateMiniView() {
                 // clamp distance camera from globe
                 var distanceCamera = view.camera.camera3D.position.length();
-                var distance = Math.min(Math.max(distanceCamera * 1.5, minDistance), maxDistance);
+                var distance = Math.min(Math.max(distanceCamera * 1.5, 10000000), 30000000);
                 var camera = miniView.camera.camera3D;
                 var cameraTargetPosition = view.controls.getCameraTargetPosition();
                 // Update target miniview's camera
@@ -35,14 +32,12 @@ var MiniView = (function () {
                 camera.lookAt(cameraTargetPosition);
                 miniView.notifyChange(camera);
             });
-        },
 
-        addLayer(layer) {
-            miniView.addLayer(layer);
-        }
+            return miniView;
+        },
     };
 }());
 
 if (typeof module != 'undefined' && module.exports) {
-    module.exports = MiniView;
+    module.exports = MiniGlobeView;
 }

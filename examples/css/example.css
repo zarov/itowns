@@ -1,7 +1,4 @@
-/** color
- * https://color.adobe.com/create/color-wheel/?base=1&rule=Triad&selected=1&name=My%20Color%20Theme&mode=rgb&rgbvalues=0.3777157360406091,0.5683627654250581,0.7,0.6395939086294415,0.8527918781726119,1,1,0.6440848843767284,0.6395939086294415,0.8,0.7982219664802797,0.43167512690355325,0.7,0.6986131779623956,0.4127157360406091&swatchOrder=0,1,2,3,4
- */
-
+/* GENERAL */
 html, body {
     margin: 0;
     padding: 0;
@@ -16,19 +13,69 @@ html, body {
     position: absolute;
 }
 
+#description {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.text {
+    z-index: 1;
+    color: #eee;
+    font: 16px 'Lucida Grande',sans-serif;
+    max-width: 40%;
+    background: #1a1a1a;
+    opacity: 0.8;
+    padding: 10px;
+}
+
+.text a {
+    color: lightcoral;
+}
+
+.text a:hover {
+    color: #f0c0c0;
+}
+
+.text > ul {
+    padding: 0 2rem;
+}
+
+@media (max-width: 600px) {
+    .text {
+        display: none;
+    }
+}
+
+/* MAIN SECTION (RIGHT) */
+#main {
+    width: calc(100% - 330px);
+    height: 100%;
+    display: inline;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+
 #content {
-    width: 100%;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: calc(100% - 330px);
 }
 
-section {
-    max-width: 50rem;
-    margin: auto;
-    padding: 2rem;
+#view-source {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
 }
 
+/* NAVIGATION (LEFT) */
 nav {
+    width: calc(330px - 4rem);
     padding: 0 2rem;
     overflow: auto;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
 }
 
 nav img {
@@ -43,6 +90,37 @@ nav .package {
     padding-bottom: 20px;
 }
 
+nav ul {
+    padding: 0;
+    margin: 0;
+}
+
+nav li {
+    list-style-type: none;
+}
+
+a, a:visited, nav ul a, nav ul a:visited {
+    cursor: pointer;
+    color: #6091b2;
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #6091b2aa;
+}
+
+h1, h2, h3, h4, h5 {
+    font-weight: bold;
+    color: #4b4b4b;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+
+/* IFRAME/EXAMPLE CONTENT */
 #viewerDiv {
     height: 100%;
 }
@@ -51,14 +129,18 @@ canvas {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: -1;
+}
+
+/* PLUGINS/GUI */
+.dg.main {
+    position: absolute;
 }
 
 #miniDiv {
     display: block;
     position: absolute;
-    width:100px;
-    height:100px;
+    width: 100px;
+    height: 100px;
     left: 20;
     bottom: 20;
     color: white;
@@ -67,17 +149,17 @@ canvas {
 #divScaleWidget {
     display: block;
     position: absolute;
-    right: 20;
+    right: 135px;
     bottom: 20;
     border: 2px solid black;
     border-top: none;
     text-align: center;
     display: block;
     background-image: linear-gradient(rgba(200, 200, 200, 0.3), rgba(200, 200, 200, 0.3));
-    width:200px;
-    height:18px;
+    width: 200px;
+    height: 18px;
     color: black;
-    font-family: 'Open Sans',
-    sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 16px;
 }
+

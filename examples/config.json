@@ -1,47 +1,47 @@
 {
     "View": {
-        "Globe": "globe",
-        "Planar": "",
-        "Splitted rendering": "",
-        "Multiple globes": "",
-        "Planar on a cube": ""
+        "Globe": "view-globe",
+        "Planar": "view-planar",
+        "Splitted rendering": "view-splitted",
+        "Multiple globes": "view-multiple",
+        "Planar on a cube": "view-cube"
     },
 
     "Source / Stream": {
-        "WMTS": "",
-        "WMS": "",
-        "WFS": "",
-        "TMS": ""
+        "WMTS": "source-stream-wmts",
+        "WMS": "source-stream-wms",
+        "WFS": "source-stream-wfs",
+        "TMS": "source-stream-tms"
     },
 
     "Source / File": {
-        "Geojson": "",
-        "GPX": "",
-        "KML": "",
-        "Shapefile": "",
-        "TIFF": "",
-        "VectorTile": ""
+        "Geojson": "source-file-geojson",
+        "GPX": "source-file-gpx",
+        "KML": "source-file-kml",
+        "Shapefile": "source-file-shapefile",
+        "TIFF": "source-file-tiff",
+        "VectorTile": "source-file-vector-tile"
     },
 
     "Source / Other": {
-        "3DTiles as a file": "",
-        "3DTiles as a stream": "",
-        "Pointcloud": "",
-        "3D model": ""
+        "3DTiles as a file": "source-other-3dtiles-file",
+        "3DTiles as a stream": "source-other-3dtiles-stream",
+        "Pointcloud": "source-other-pointcloud",
+        "3D model": "source-other-3dmodel"
     },
 
     "Controls": {
-        "Globe controls": "",
-        "Planar controls": "",
-        "Planar controls in orthographic": "",
-        "First person controls": "",
-        "Camera animation": "",
-        "Synchronized views": ""
+        "Globe controls": "controls-globe",
+        "Planar controls": "controls-planar",
+        "Planar controls in orthographic": "controls-orthographic",
+        "First person controls": "controls-first-person",
+        "Camera animation": "controls-animation",
+        "Synchronized views": "controls-synchronized"
     },
 
     "Plugins": {
-        "Drag and drop": "",
-        "Stereo effects": "",
-        "Post processing": ""
+        "Drag and drop": "plugins-drag-n-drop",
+        "Stereo effects": "plugins-stereo",
+        "Post processing": "plugins-postprocessing"
     }
 }

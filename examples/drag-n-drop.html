@@ -9,14 +9,13 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
     </head>
     <body>
-        <div id="viewerDiv">
-            <div class="help"><p>Drag and drop a Geojson or Gpx file onto the
-                viewer, and see it loaded as a ColorLayer. Only files with the
-                projection <b>EPSG:4326</b> can be projected correctly in this
-                demo. More information about the plugin used <a
-                 href="http://www.itowns-project.org/itowns/docs/#api/Plugins/DragNDrop"
-                 target="_blank">in the documentation.</a></p></div>
-        </div>
+        <div id="description" class="text">Drag and drop a Geojson or Gpx
+            file onto the viewer, and see it loaded as a ColorLayer. Only
+            files with the projection <b>EPSG:4326</b> can be projected
+            correctly in this demo. More information about the plugin used
+            <a href="http://www.itowns-project.org/itowns/docs/#api/Plugins/DragNDrop" target="_blank">
+            in the documentation.</a></div>
+        <div id="viewerDiv"></div>
         <script src="js/plugins/DragNDrop.js"></script>
         <script src="../dist/itowns.js"></script>
         <script src="js/GUI/LoadingScreen.js"></script>

@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <title>Itowns Examples</title>
 
-    <link type="text/css" rel="stylesheet" href="../docs/static/styles/jsdoc-default.css">
-    <link type="text/css" rel="stylesheet" href="../docs/static/styles/itowns.css">
+    <link type="text/css" rel="stylesheet" href="css/example.css">
 </head>
 
 <body data-spy="scroll" data-target="nav" onload="onLoad()">
 
 <div id="main">
     <iframe id="content" class="scroll-section" frameborder="0" height="100%"></iframe>
+    <div id="view-source" class="text"></div>
 </div>
 
 <nav class="scroll-section">
@@ -37,8 +37,6 @@
         if (document.location.hash) {
             var url = document.location.href.replace('#', '') + '.html';
             goTo(url);
-        } else {
-            //goTo('home.html', 'home');
         }
     };
 
@@ -46,6 +44,11 @@
         if (slug) window.location.hash = slug;
         var iframe = document.getElementById('content');
         iframe.src = url;
+
+        var viewSrc = '<a href="https://github.com/iTowns/itowns/blob/master/examples/';
+        viewSrc += window.location.hash.substr(1);
+        viewSrc += '.html" target="_blank">View source</a>';
+        document.getElementById('view-source').innerHTML = viewSrc;
     };
 
     function initNavigation(list) {

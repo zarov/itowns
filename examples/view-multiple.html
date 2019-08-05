@@ -1,30 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Itowns - multiglobe</title>
+        <title>Itowns - Multiple globes</title>
 
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="css/example.css">
         <link rel="stylesheet" type="text/css" href="css/LoadingScreen.css">
 
-        <style type="text/css">
-            #help {
-                position: absolute;
-                top: 0;
-                width: 100%;
-                color: white;
-                font-size: 2em;
-                text-align: center;
-            }
-        </style>
-
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/GUI/LoadingScreen.js"></script>
+
+        <script src="../dist/itowns.js"></script>
     </head>
     <body>
+        <div id="description" class="text">Press <b>Space</b> to switch
+            globe</div>
         <div id="viewerDiv"></div>
-        <span id="help">Press <em>Space</em> to switch globe</span>
-        <script src="../dist/itowns.js"></script>
-        <script src="js/GUI/LoadingScreen.js"></script>
+
         <script type="text/javascript">
             /* global itowns,document,GuiTools*/
             var positionOnGlobe = { longitude: 2.351323, latitude: 48.856712, altitude: 35000000 };
