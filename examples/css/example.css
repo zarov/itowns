@@ -19,7 +19,7 @@ html, body {
     right: 10px;
 }
 
-.text {
+#description, .text {
     z-index: 1;
     color: #eee;
     font: 16px 'Lucida Grande',sans-serif;
