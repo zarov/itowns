@@ -3,6 +3,7 @@
 
 [![Coverage Status](https://coveralls.io/repos/github/iTowns/itowns/badge.svg?branch=master)](https://coveralls.io/github/iTowns/itowns?branch=master)
 [![Build Status](https://travis-ci.com/iTowns/itowns.svg?branch=master)](https://travis-ci.com/iTowns/itowns)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fzarov%2Fitowns.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fzarov%2Fitowns?ref=badge_shield)
 
 ## What is it?
 
@@ -79,6 +80,9 @@ iTowns is dual-licenced under Cecill-B V1.0 and MIT.
 Incorporated libraries are published under their original licences.
 
 See [LICENSE.md](LICENSE.md) for more information.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fzarov%2Fitowns.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fzarov%2Fitowns?ref=badge_large)
 
 ## Support
 
