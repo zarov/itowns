@@ -12,6 +12,12 @@ const event = {
     stopPropagation: () => {},
     preventDefault: () => {},
     button: THREE.MOUSE.LEFT,
+    touches: [{
+        clientX: 150,
+        clientY: 200,
+        pageX: 150,
+        pageY: 200,
+    }],
 };
 
 describe('GlobeControls', function () {
@@ -61,18 +67,19 @@ describe('GlobeControls', function () {
         });
     });
 
-    event.touches = [1, 1];
-    it('touch start', function (done) {
-        renderer.domElement.emitEvent('touchstart', event).then(() => {
-            done();
+    describe('touch handling', function () {
+        it('touch start', function (done) {
+            renderer.domElement.emitEvent('touchstart', event).then(() => {
+                done();
+            });
         });
-    });
 
-    it('touch move', function () {
-        renderer.domElement.emitEvent('touchmove', event);
-    });
+        it('touch move', function () {
+            renderer.domElement.emitEvent('touchmove', event);
+        });
 
-    it('touch end', function () {
-        renderer.domElement.emitEvent('touchend', event);
+        it('touch end', function () {
+            renderer.domElement.emitEvent('touchend', event);
+        });
     });
 });
