@@ -4,6 +4,10 @@ import GlobeView from 'Core/Prefab/GlobeView';
 import ObjectRemovalHelper from 'Process/ObjectRemovalHelper';
 import Renderer from './mock';
 
+function compareWithEpsilon(a, b, epsilon) {
+    return a - epsilon, b && a + epsilon > b;
+}
+
 describe('GlobeView', function () {
     const renderer = new Renderer();
 
@@ -56,30 +60,30 @@ describe('GlobeView', function () {
         it('should get the zoom scale', () => {
             const computed = viewer.getScale();
             const scale = 1 / 25000;
-            assert.ok(computed < scale + 10e-7);
-            assert.ok(computed > scale - 10e-7);
+            assert.ok(compareWithEpsilon(computed, scale, 10e-7));
+            assert.ok(compareWithEpsilon(computed, scale, 10e-7));
         });
 
         it('should get the distance from the camera', () => {
             const realDistance = viewer.getDistanceFromCamera();
-            assert.ok(realDistance < positionOnGlobe.altitude + 10);
-            assert.ok(realDistance > positionOnGlobe.altitude - 10);
+            assert.ok(compareWithEpsilon(realDistance, positionOnGlobe.altitude, 10));
+            assert.ok(compareWithEpsilon(realDistance, positionOnGlobe.altitude, 10));
         });
 
         it('should convert a pixel distance to meters', () => {
             // (1 / 0.28) pixel is equal to 1 cm on screen, so 25m on ground
             const computed = viewer.getPixelsToMeters(1 / 0.28);
             const meters = 25;
-            assert.ok(computed < meters + 10e-3);
-            assert.ok(computed > meters - 10e-3);
+            assert.ok(compareWithEpsilon(computed, meters, 10e-3));
+            assert.ok(compareWithEpsilon(computed, meters, 10e-3));
         });
 
         it('should convert a meter distance to pixels', () => {
             // 25m on ground should give 1 cm on screen, so (1 / 0.28) pixels
             const computed = 1 / viewer.getMetersToPixels(25);
             const pixels = 0.28;
-            assert.ok(computed < pixels + 10e-4);
-            assert.ok(computed > pixels - 10e-4);
+            assert.ok(compareWithEpsilon(computed, pixels, 10e-4));
+            assert.ok(compareWithEpsilon(computed, pixels, 10e-4));
         });
     });
 });
