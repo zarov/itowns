@@ -3,24 +3,24 @@ import assert from 'assert';
 import GlobeView from 'Core/Prefab/GlobeView';
 import Renderer from './mock';
 
-const renderer = new Renderer();
-
-const positionOnGlobe = { longitude: 2.351323, latitude: 48.856712, altitude: 250000 };
-const viewer = new GlobeView(renderer.domElement, positionOnGlobe, { renderer });
-
-const event = {
-    stopPropagation: () => {},
-    preventDefault: () => {},
-    button: THREE.MOUSE.LEFT,
-    touches: [{
-        clientX: 150,
-        clientY: 200,
-        pageX: 150,
-        pageY: 200,
-    }],
-};
-
 describe('GlobeControls', function () {
+    const renderer = new Renderer();
+
+    const positionOnGlobe = { longitude: 2.351323, latitude: 48.856712, altitude: 250000 };
+    const viewer = new GlobeView(renderer.domElement, positionOnGlobe, { renderer });
+
+    const event = {
+        stopPropagation: () => {},
+        preventDefault: () => {},
+        button: THREE.MOUSE.LEFT,
+        touches: [{
+            clientX: 150,
+            clientY: 200,
+            pageX: 150,
+            pageY: 200,
+        }],
+    };
+
     it('instance GlobeControls', function () {
         assert.ok(viewer.controls);
     });
