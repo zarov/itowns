@@ -5,7 +5,7 @@ import ObjectRemovalHelper from 'Process/ObjectRemovalHelper';
 import Renderer from './mock';
 
 function compareWithEpsilon(a, b, epsilon) {
-    return a - epsilon, b && a + epsilon > b;
+    return a - epsilon < b && a + epsilon > b;
 }
 
 describe('GlobeView', function () {
