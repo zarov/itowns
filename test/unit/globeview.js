@@ -41,18 +41,20 @@ describe('GlobeView', function () {
         assert.ok(viewer);
     });
 
-    it('update', function () {
+    it('update', function (done) {
         viewer.tileLayer.whenReady.then(() => {
             const node = viewer.tileLayer.level0Nodes[0];
             viewer.tileLayer.update(context, viewer.tileLayer, node);
+            done();
         });
     });
 
-    it('ObjectRemovalHelper', function () {
+    it('ObjectRemovalHelper', function (done) {
         viewer.tileLayer.whenReady.then(() => {
             const node = viewer.tileLayer.level0Nodes[0];
             ObjectRemovalHelper.removeChildrenAndCleanup(viewer.tileLayer, node);
             ObjectRemovalHelper.removeChildren(viewer.tileLayer, node);
+            done();
         });
     });
 
