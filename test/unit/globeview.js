@@ -74,6 +74,7 @@ describe('GlobeView', function () {
             // (1 / 0.28) pixel is equal to 1 cm on screen, so 25m on ground
             const computed = viewer.getPixelsToMeters(1 / 0.28);
             const meters = 25;
+            // eslint-disable-next-line
             console.log(computed, meters);
             assert.ok(compareWithEpsilon(computed, meters, 10e-3));
             assert.ok(compareWithEpsilon(computed, meters, 10e-3));
