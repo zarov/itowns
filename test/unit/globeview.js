@@ -15,12 +15,18 @@ describe('GlobeView', function () {
     // pitch of 0.28. The approximation is corrected below with an epsilon.
     const positionOnGlobe = { longitude: 4.631512, latitude: 43.675626, altitude: 3919 };
     const viewer = new GlobeView(renderer.domElement, positionOnGlobe, { renderer });
+    // eslint-disable-next-line
+    console.log(viewer.getDistanceFromCamera());
     const pickedPosition = new THREE.Vector3();
     pickedPosition.copy(viewer.camera.position());
 
     const cameraDirection = new THREE.Vector3();
     viewer.camera.camera3D.getWorldDirection(cameraDirection);
+    // eslint-disable-next-line
+    console.log(viewer.getDistanceFromCamera());
     cameraDirection.multiplyScalar(positionOnGlobe.altitude);
+    // eslint-disable-next-line
+    console.log(viewer.getDistanceFromCamera());
     pickedPosition.add(cameraDirection);
 
     viewer.getPickingPositionFromDepth = function getPickingPositionFromDepth(screenCoord, targetPoint = new THREE.Vector3()) {
@@ -38,6 +44,8 @@ describe('GlobeView', function () {
     };
 
     it('instance', function () {
+        // eslint-disable-next-line
+        console.log(viewer.getDistanceFromCamera());
         assert.ok(viewer);
     });
 
@@ -45,6 +53,8 @@ describe('GlobeView', function () {
         viewer.tileLayer.whenReady.then(() => {
             const node = viewer.tileLayer.level0Nodes[0];
             viewer.tileLayer.update(context, viewer.tileLayer, node);
+            // eslint-disable-next-line
+            console.log(viewer.getDistanceFromCamera());
             done();
         });
     });
@@ -54,12 +64,16 @@ describe('GlobeView', function () {
             const node = viewer.tileLayer.level0Nodes[0];
             ObjectRemovalHelper.removeChildrenAndCleanup(viewer.tileLayer, node);
             ObjectRemovalHelper.removeChildren(viewer.tileLayer, node);
+            // eslint-disable-next-line
+            console.log(viewer.getDistanceFromCamera());
             done();
         });
     });
 
     describe('Measuring', function () {
         it('should get the zoom scale', () => {
+            // eslint-disable-next-line
+            console.log(viewer.getDistanceFromCamera());
             const computed = viewer.getScale();
             const scale = 1 / 25000;
             assert.ok(compareWithEpsilon(computed, scale, 10e-7));
@@ -67,6 +81,8 @@ describe('GlobeView', function () {
         });
 
         it('should get the distance from the camera', () => {
+            // eslint-disable-next-line
+            console.log(viewer.getDistanceFromCamera());
             const realDistance = viewer.getDistanceFromCamera();
             assert.ok(compareWithEpsilon(realDistance, positionOnGlobe.altitude, 10));
             assert.ok(compareWithEpsilon(realDistance, positionOnGlobe.altitude, 10));
