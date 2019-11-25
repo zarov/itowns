@@ -74,7 +74,7 @@ describe('GlobeView', function () {
 
         it('should convert a pixel distance to meters', () => {
             // eslint-disable-next-line
-            console.log(viewer);
+            console.log(viewer.getDistanceFromCamera());
             // (1 / 0.28) pixel is equal to 1 cm on screen, so 25m on ground
             const computed = viewer.getPixelsToMeters(1 / 0.28);
             const meters = 25;
