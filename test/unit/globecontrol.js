@@ -67,19 +67,19 @@ describe('GlobeControls', function () {
         });
     });
 
-    describe('touch handling', function () {
-        it('touch start', function (done) {
-            renderer.domElement.emitEvent('touchstart', event).then(() => {
-                done();
-            });
-        });
-
-        it('touch move', function () {
-            renderer.domElement.emitEvent('touchmove', event);
-        });
-
-        it('touch end', function () {
-            renderer.domElement.emitEvent('touchend', event);
+    // describe('touch handling', function () {
+    it('touch start', function (done) {
+        renderer.domElement.emitEvent('touchstart', event).then(() => {
+            done();
         });
     });
+
+    it('touch move', function () {
+        renderer.domElement.emitEvent('touchmove', event);
+    });
+
+    it('touch end', function () {
+        renderer.domElement.emitEvent('touchend', event);
+    });
+    // });
 });
