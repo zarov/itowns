@@ -2,7 +2,7 @@ import assert from 'assert';
 import GeoJsonParser from 'Parser/GeoJsonParser';
 import FeaturesUtils from 'Utils/FeaturesUtils';
 import Coordinates from 'Core/Geographic/Coordinates';
-import { FEATURE_TYPES } from 'Core/Feature';
+import { FEATURE_TYPES } from 'Core/Objects/Feature';
 
 const geojson = require('../data/geojson/simple.geojson.json');
 

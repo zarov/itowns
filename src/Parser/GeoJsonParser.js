@@ -1,6 +1,7 @@
 import Coordinates from 'Core/Geographic/Coordinates';
-import Feature, { FeatureCollection, FEATURE_TYPES } from 'Core/Feature';
-import Style from '../Core/Style';
+import Feature, { FEATURE_TYPES } from 'Core/Objects/Feature';
+import FeatureCollection from 'Core/Objects/FeatureCollection';
+import Style from 'Core/Objects/Style';
 
 function readCRS(json) {
     if (json.crs) {

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { FEATURE_TYPES } from 'Core/Feature';
+import { FEATURE_TYPES } from 'Core/Objects/Feature';
 import Extent from 'Core/Geographic/Extent';
 import Coordinates from 'Core/Geographic/Coordinates';
 

@@ -32,8 +32,10 @@ export { getMaxColorSamplerUnitsCount } from 'Renderer/LayeredMaterial';
 export { default as Capabilities } from 'Core/System/Capabilities';
 
 // Internal itowns format
-export { default as Feature, FeatureCollection, FeatureGeometry, FEATURE_TYPES } from 'Core/Feature';
-export { default as Style } from 'Core/Style';
+export { default as FeatureCollection } from 'Core/Objects/FeatureCollection';
+export { default as Feature } from 'Core/Objects/Feature';
+export { default as FeatureGeometry } from 'Core/Objects/FeatureGeometry';
+export { default as Style } from 'Core/Objects/Style';
 
 // Layers provided by default in iTowns
 // A custom layer should at least implements Layer

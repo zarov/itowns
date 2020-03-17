@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Earcut from 'earcut';
 import Coordinates from 'Core/Geographic/Coordinates';
-import { FEATURE_TYPES } from 'Core/Feature';
+import { FEATURE_TYPES } from 'Core/Objects/Feature';
 
 function getProperty(name, options, defaultValue, ...args) {
     const property = options[name];

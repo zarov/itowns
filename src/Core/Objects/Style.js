@@ -1,4 +1,4 @@
-import { FEATURE_TYPES } from 'Core/Feature';
+import { FEATURE_TYPES } from 'Core/Objects/Feature';
 import Cache from 'Core/Scheduler/Cache';
 
 const inv255 = 1 / 255;

@@ -1,5 +1,5 @@
 import assert from 'assert';
-import Feature, { FEATURE_TYPES } from 'Core/Feature';
+import Feature, { FEATURE_TYPES } from 'Core/Objects/Feature';
 import Coordinates from 'Core/Geographic/Coordinates';
 
 describe('Feature', function () {

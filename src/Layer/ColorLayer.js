@@ -1,7 +1,7 @@
 import Layer from 'Layer/Layer';
 import { updateLayeredMaterialNodeImagery, removeLayeredMaterialNodeLayer } from 'Process/LayeredMaterialNodeProcessing';
 import textureConverter from 'Converter/textureConverter';
-import Style from 'Core/Style';
+import Style from 'Core/Objects/Style';
 
 /**
  * Fires when the visiblity of the layer has changed.

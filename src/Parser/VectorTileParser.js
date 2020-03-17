@@ -2,9 +2,10 @@ import { Vector2, Vector3 } from 'three';
 import Protobuf from 'pbf';
 import { VectorTile } from '@mapbox/vector-tile';
 import { globalExtentTMS } from 'Core/Geographic/Extent';
-import { FeatureCollection, FEATURE_TYPES } from 'Core/Feature';
+import { FEATURE_TYPES } from 'Core/Objects/Feature';
+import FeatureCollection from 'Core/Objects/FeatureCollection';
 import { featureFilter } from '@mapbox/mapbox-gl-style-spec';
-import Style from 'Core/Style';
+import Style from 'Core/Objects/Style';
 
 const worldDimension3857 = globalExtentTMS.get('EPSG:3857').dimensions();
 const globalExtent = new Vector3(worldDimension3857.x, worldDimension3857.y, 1);

@@ -1,4 +1,4 @@
-import { FEATURE_TYPES } from 'Core/Feature';
+import { FEATURE_TYPES } from 'Core/Objects/Feature';
 import Coordinates from 'Core/Geographic/Coordinates';
 import Extent from 'Core/Geographic/Extent';
 import Crs from 'Core/Geographic/Crs';
