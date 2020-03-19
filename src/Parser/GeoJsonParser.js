@@ -145,22 +145,22 @@ function jsonFeatureToFeature(crsIn, crsOut, json, filteringExtent, options, fea
     return feature;
 }
 
-function jsonFeaturesToFeatures(crsIn, crsOut, jsonFeatures, filteringExtent, options) {
-    const features = new FeatureCollection(crsOut, options);
+function jsonFeaturesToFeatureCollection(crsIn, crsOut, jsonFeatures, filteringExtent, options) {
+    const collection = new FeatureCollection(crsOut, options);
 
     for (const jsonFeature of jsonFeatures) {
-        const feature = jsonFeatureToFeature(crsIn, crsOut, jsonFeature, filteringExtent, options, features);
+        const feature = jsonFeatureToFeature(crsIn, crsOut, jsonFeature, filteringExtent, options, collection);
         if (feature && !options.mergeFeatures) {
-            features.pushFeature(feature);
+            collection.pushFeature(feature);
         }
     }
 
     if (options.mergeFeatures) {
-        features.removeEmptyFeature();
-        features.updateExtent();
+        collection.removeEmptyFeature();
+        collection.updateExtent();
     }
 
-    return features;
+    return collection;
 }
 
 /**
@@ -211,9 +211,9 @@ export default {
 
         switch (json.type.toLowerCase()) {
             case 'featurecollection':
-                return Promise.resolve(jsonFeaturesToFeatures(options.crsIn, crsOut, json.features, filteringExtent, options));
+                return Promise.resolve(jsonFeaturesToFeatureCollection(options.crsIn, crsOut, json.features, filteringExtent, options));
             case 'feature':
-                return Promise.resolve(jsonFeaturesToFeatures(options.crsIn, crsOut, [json], filteringExtent, options));
+                return Promise.resolve(jsonFeaturesToFeatureCollection(options.crsIn, crsOut, [json], filteringExtent, options));
             default:
                 throw new Error(`Unsupported GeoJSON type: '${json.type}`);
         }

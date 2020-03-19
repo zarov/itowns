@@ -118,23 +118,23 @@ function readPBF(file, options) {
     options.withAltitude = false;
     options.withNormal = false;
 
-    const features = new FeatureCollection('EPSG:3857', options);
+    const collection = new FeatureCollection('EPSG:3857', options);
     // TODO remove defaultFilter;
-    features.filter = options.filter || defaultFilter;
+    collection.filter = options.filter || defaultFilter;
 
     const vFeature = vectorTile.layers[sourceLayers[0]];
     // TODO: verify if size is correct because is computed with only one feature (vFeature).
     const size = vFeature.extent * 2 ** z;
     const center = -0.5 * size;
-    features.scale.set(size, -size, 1).divide(globalExtent);
-    features.translation.set(-(vFeature.extent * x + center), -(vFeature.extent * y + center), 0).divide(features.scale);
+    collection.scale.set(size, -size, 1).divide(globalExtent);
+    collection.translation.set(-(vFeature.extent * x + center), -(vFeature.extent * y + center), 0).divide(collection.scale);
 
-    const allLayers = features.filter;
-    if (!features.filter.loaded) {
+    const allLayers = collection.filter;
+    if (!collection.filter.loaded) {
         allLayers.forEach((l) => {
             l.filterExpression = featureFilter(l.filter);
         });
-        features.filter.loaded = true;
+        collection.filter.loaded = true;
     }
 
     sourceLayers.forEach((layer_id) => {
@@ -155,13 +155,13 @@ function readPBF(file, options) {
                 }
                 const order = allLayers.findIndex(l => l.id == layer.id);
                 if (!feature) {
-                    feature = features.requestFeatureById(layer.id, vtFeature.type - 1);
+                    feature = collection.requestFeatureById(layer.id, vtFeature.type - 1);
                     feature.id = layer.id;
                     feature.order = order;
                     feature.style = style;
                     vtFeatureToFeatureGeometry(vtFeature, feature);
-                } else if (!features.features.find(f => f.id === layer.id)) {
-                    feature = features.newFeatureByReference(feature);
+                } else if (!collection.features.find(f => f.id === layer.id)) {
+                    feature = collection.newFeatureByReference(feature);
                     feature.id = layer.id;
                     feature.order = order;
                     feature.style = style;
@@ -170,12 +170,12 @@ function readPBF(file, options) {
         }
     });
 
-    features.removeEmptyFeature();
+    collection.removeEmptyFeature();
     // TODO verify if is needed to updateExtent for previous features.
-    features.updateExtent();
-    features.features.sort((a, b) => (a.order - b.order));
-    features.extent = extentSource;
-    return Promise.resolve(features);
+    collection.updateExtent();
+    collection.features.sort((a, b) => (a.order - b.order));
+    collection.extent = extentSource;
+    return Promise.resolve(collection);
 }
 
 /**
