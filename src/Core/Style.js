@@ -320,6 +320,9 @@ class Style {
 
             // content
             this.text.field = readVectorProperty(layer.layout['text-field'], zoom) || this.text.field;
+            if (this.text.field !== undefined) {
+                this.text.field = this.text.field.replace(/\{(.+?)\}/g, (a, b) => (b));
+            }
             this.text.wrap = readVectorProperty(layer.layout['text-max-width'], zoom) || this.text.wrap;
             this.text.spacing = readVectorProperty(layer.layout['text-letter-spacing'], zoom) || this.text.spacing;
             this.text.transform = readVectorProperty(layer.layout['text-transform'], zoom) || this.text.transform;
