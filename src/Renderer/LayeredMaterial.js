@@ -166,6 +166,20 @@ class LayeredMaterial extends THREE.RawShaderMaterial {
         this.uniforms.colorTextures = new THREE.Uniform(new Array(nbSamplers[1]).fill(null));
         this.uniforms.colorOffsetScales = new THREE.Uniform(new Array(nbSamplers[1]).fill(identityOffsetScale));
         this.uniforms.colorTextureCount = new THREE.Uniform(0);
+
+        let _visible = this.visible;
+        // can't do an ES6 setter/getter here
+        Object.defineProperty(this, 'visible', {
+            get() { return _visible; },
+            set(v) {
+                _visible = v;
+                if (!v) {
+                    this.dispatchEvent({ type: 'invisible' });
+                } else {
+                    this.dispatchEvent({ type: 'visible' });
+                }
+            },
+        });
     }
 
     getUniformByType(type) {
