@@ -22,7 +22,7 @@ describe('Viewer', function () {
             projection: 'EPSG:4326',
         });
 
-        colorLayer = new ColorLayer('l0', { source });
+        colorLayer = new ColorLayer('l0', { source, labelEnabled: true });
     });
 
     beforeEach('reset viewer', function () {

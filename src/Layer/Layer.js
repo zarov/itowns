@@ -6,6 +6,9 @@ import InfoLayer from 'Layer/InfoLayer';
  * @property {boolean} isLayer - Used to checkout whether this layer is a Layer.
  * Default is true. You should not change this, as it is used internally for
  * optimisation.
+ * @property {boolean} [labelEnabled=false] - Used to tell if this layer has
+ * labels to display from its data. For example, it needs to be set to `true`
+ * for a layer with vector tiles.
  */
 class Layer extends THREE.EventDispatcher {
     /**

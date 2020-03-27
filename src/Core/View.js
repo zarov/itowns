@@ -7,11 +7,10 @@ import RenderMode from 'Renderer/RenderMode';
 import CRS from 'Core/Geographic/Crs';
 import Coordinates from 'Core/Geographic/Coordinates';
 import FeaturesUtils from 'Utils/FeaturesUtils';
-
 import { getMaxColorSamplerUnitsCount } from 'Renderer/LayeredMaterial';
-
 import Scheduler from 'Core/Scheduler/Scheduler';
 import Picking from 'Core/Picking';
+import LabelLayer from 'Layer/LabelLayer';
 
 export const VIEW_EVENTS = {
     /**
@@ -68,6 +67,16 @@ function _preprocessLayer(view, layer, parentLayer) {
         layer.projection = source.projection;
     } else {
         layer.projection = parentLayer.extent.crs;
+    }
+
+    if (layer.labelEnabled && source) {
+        const labelLayer = new LabelLayer(`${layer.id}-label`, view.referenceCrs);
+        labelLayer.source = source;
+        labelLayer.style = layer.style;
+
+        layer.whenReady = layer.whenReady.then(() => {
+            view.addLayer(labelLayer);
+        });
     }
 
     layer.whenReady = layer.whenReady.then(() => {
