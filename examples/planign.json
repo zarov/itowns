@@ -5402,7 +5402,7 @@
             "source": "plan_ign",
             "source-layer": "toponyme_bati_ponc",
             "minzoom":14,
-            "filter": ["==","txt_typo","TYPO_E_GE"],
+            "filter": ["==","txt_typo","TYPO_E1"],
             "layout": {
                 "visibility": "visible",
                 "symbol-placement": "point",
