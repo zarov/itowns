@@ -220,6 +220,10 @@ class LabelLayer extends Layer {
                     result.forEach(labels => labels.forEach(label => node.remove(label)));
                     node.domElement.parentElement.removeChild(node.domElement);
                 });
+
+                this.addEventListener('visible-property-changed', (event) => {
+                    result.forEach(labels => labels.forEach((label) => { label.forceHidden = !event.target.visible; }));
+                });
             }
 
             node.layerUpdateState[this.id].noMoreUpdatePossible();
