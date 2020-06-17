@@ -233,9 +233,9 @@
 
             var wfsBuildingLayer = new itowns.GeometryLayer('wfsBuilding', new itowns.THREE.Group(), {
                 update: itowns.FeatureProcessing.update,
+                batchId: function (property, featureId) { return featureId; },
                 convert: itowns.Feature2Mesh.convert({
                     color: colorBuildings,
-                    batchId: function (property, featureId) { return featureId; },
                     altitude: altitudeBuildings,
                     extrude: extrudeBuildings }),
                 onMeshCreated: function scaleZ(mesh) {

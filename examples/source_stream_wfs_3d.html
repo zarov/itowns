@@ -183,9 +183,9 @@
                 update: itowns.FeatureProcessing.update,
                 convert: itowns.Feature2Mesh.convert({
                     color: colorBuildings,
-                    batchId: function (property, featureId) { return featureId; },
                     altitude: altitudeBuildings,
                     extrude: extrudeBuildings }),
+                batchId: function (property, featureId) { return featureId; },
                 onMeshCreated: function scaleZ(mesh) {
                     mesh.scale.z = 0.01;
                     meshes.push(mesh);

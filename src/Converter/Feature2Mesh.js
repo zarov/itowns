@@ -502,8 +502,10 @@ export default {
      * });
      */
     convert(options = {}) {
-        return function _convert(collection) {
+        return function _convert(collection, extent, layer) {
             if (!collection) { return; }
+
+            options.batchId = layer.batchId;
 
             return featuresToThree(collection.features, options);
         };
