@@ -261,7 +261,7 @@ function featureToPolygon(feature, options) {
         const lastIndice = geometry.indices.slice(-1)[0];
         const end = lastIndice.offset + lastIndice.count;
         const count = end - start;
-        const altitude = getProperty('altitude', options, 0, geometry.properties);
+        const altitude = options.style.getAltitudeFromProperties(geometry.properties);
         if (altitude !== 0) {
             coordinatesToVertices(ptsIn, normals, vertices, altitude, 0, start, count);
         }
@@ -327,8 +327,8 @@ function featureToExtrudedPolygon(feature, options) {
     let featureId = 0;
 
     for (const geometry of feature.geometries) {
-        const altitude = getProperty('altitude', options, 0, geometry.properties);
-        const extrude = getProperty('extrude', options, 0, geometry.properties);
+        const altitude = options.style.getAltitudeFromProperties(geometry.properties);
+        const extrude = options.style.getExtrusionFromProperties(geometry.properties);
 
         const colorTop = getProperty('color', options, randomColor, geometry.properties);
         color.copy(colorTop);
@@ -411,7 +411,7 @@ function featureToMesh(feature, options) {
             mesh = featureToLine(feature, options);
             break;
         case FEATURE_TYPES.POLYGON:
-            if (options.extrude) {
+            if (options.style && options.style.geometry.extrude) {
                 mesh = featureToExtrudedPolygon(feature, options);
             } else {
                 mesh = featureToPolygon(feature, options);
@@ -505,6 +505,7 @@ export default {
         return function _convert(collection, extent, layer) {
             if (!collection) { return; }
 
+            options.style = layer.style;
             options.batchId = layer.batchId;
 
             return featuresToThree(collection.features, options);

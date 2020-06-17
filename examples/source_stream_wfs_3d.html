@@ -132,14 +132,6 @@
                 return color.set(0xeeeeee);
             }
 
-            function altitudeBuildings(properties) {
-                return properties.z_min - properties.hauteur;
-            }
-
-            function extrudeBuildings(properties) {
-                return properties.hauteur;
-            }
-
             function acceptFeature(properties) {
                 return !!properties.hauteur;
             }
@@ -163,6 +155,17 @@
 
             view.addFrameRequester(itowns.MAIN_LOOP_EVENTS.BEFORE_RENDER, scaler);
 
+            var wfsBuildingStyle = new itowns.Style({
+                geometry: {
+                    extrude: 'hauteur',
+                    altitude: function altitudeBuildings(properties) {
+                        return properties.z_min - properties.hauteur;
+                    }
+                },
+            });
+            var wfsBuildingRemarquableStyle = wfsBuildingStyle.clone();
+            var wfsBuildingIndustrielStyle = wfsBuildingStyle.clone();
+
             var wfsBuildingSource = new itowns.WFSSource({
                 url: 'https://wxs.ign.fr/3ht7xcw6f7nciopo16etuqp2/geoportail/wfs?',
                 version: '2.0.0',
@@ -178,13 +181,24 @@
                     north: 46.03,
                 },
             });
+            wfsBuildingSource.onParsedFile = function(collection) {
+                collection.features.forEach(f => f.geometries.forEach((g) => {
+                    if (g.properties.id.includes('bati_remarquable')) {
+                        g.properties.style = wfsBuildingRemarquableStyle;
+                    } else if (g.properties.id.includes('bati_industriel')) {
+                        g.properties.style = wfsBuildingIndustrielStyle;
+                    } else {
+                        g.properties.style = wfsBuildingStyle;
+                    }
+                }));
+                return collection;
+            };
 
             var wfsBuildingLayer = new itowns.GeometryLayer('WFS Building', new itowns.THREE.Group(), {
                 update: itowns.FeatureProcessing.update,
                 convert: itowns.Feature2Mesh.convert({
                     color: colorBuildings,
-                    altitude: altitudeBuildings,
-                    extrude: extrudeBuildings }),
+                }),
                 batchId: function (property, featureId) { return featureId; },
                 onMeshCreated: function scaleZ(mesh) {
                     mesh.scale.z = 0.01;
@@ -192,7 +206,8 @@
                 },
                 filter: acceptFeature,
                 overrideAltitudeInToZero: true,
-                source: wfsBuildingSource
+                source: wfsBuildingSource,
+                style: wfsBuildingStyle,
             });
             view.addLayer(wfsBuildingLayer);
 

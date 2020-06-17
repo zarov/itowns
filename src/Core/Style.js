@@ -56,6 +56,17 @@ const textAnchorPosition = {
     'top-left': [0, 0],
 };
 
+function getGeometryProperty(property, options) {
+    const type = typeof property;
+    if (type === 'function') {
+        return property(options);
+    } else if (type === 'string') {
+        return options[property];
+    } else {
+        return property;
+    }
+}
+
 /**
  * A Style is an object that defines the visual appearance of {@link
  * FeatureCollection} and {@link Feature}. It is taken into account when drawing
@@ -190,6 +201,7 @@ class Style {
         params.stroke = params.stroke || {};
         params.point = params.point || {};
         params.text = params.text || {};
+        params.geometry = params.geometry || {};
 
         this.fill = {
             color: params.fill.color,
@@ -233,6 +245,11 @@ class Style {
                 width: (params.text.halo && params.text.halo.width) || 0,
                 blur: (params.text.halo && params.text.halo.blur) || 0,
             },
+        };
+
+        this.geometry = {
+            extrude: params.geometry.extrude || 0,
+            altitude: params.geometry.altitude || 0,
         };
     }
 
@@ -479,6 +496,14 @@ class Style {
      */
     getTextFromProperties(properties) {
         return this.text.field.replace(/\{(.+?)\}/g, (a, b) => (properties[b] || ''));
+    }
+
+    getExtrusionFromProperties(properties) {
+        return getGeometryProperty(this.geometry.extrude, properties);
+    }
+
+    getAltitudeFromProperties(properties) {
+        return getGeometryProperty(this.geometry.altitude, properties);
     }
 }
 
