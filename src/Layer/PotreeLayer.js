@@ -33,7 +33,7 @@ function computeScreenSpaceError(context, pointSize, spacing, elt, distance) {
     if (distance <= 0) {
         return Infinity;
     }
-    const pointSpacing = spacing / 2 ** elt.name.length;
+    const pointSpacing = spacing / 2 ** elt.depth;
     // Estimate the onscreen distance between 2 points
     const onScreenSpacing = context.camera.preSSE * pointSpacing / distance;
     // [  P1  ]--------------[   P2   ]
@@ -117,28 +117,30 @@ class PotreeLayer extends GeometryLayer {
         this.material.defines = this.material.defines || {};
         this.mode = MODE.COLOR || config.mode;
 
-        const resolve = this.addInitializationStep();
+        if (!config.noInitialization) {
+            const resolve = this.addInitializationStep();
 
-        this.source.whenReady.then((cloud) => {
-            this.scale = new THREE.Vector3().addScalar(cloud.scale);
-            this.spacing = cloud.spacing;
-            this.hierarchyStepSize = cloud.hierarchyStepSize;
+            this.source.whenReady.then((cloud) => {
+                this.scale = new THREE.Vector3().addScalar(cloud.scale);
+                this.spacing = cloud.spacing;
+                this.hierarchyStepSize = cloud.hierarchyStepSize;
 
-            const normal = Array.isArray(cloud.pointAttributes) &&
-                        cloud.pointAttributes.find(elem => elem.startsWith('NORMAL'));
-            if (normal) {
-                this.material.defines[normal] = 1;
-            }
+                const normal = Array.isArray(cloud.pointAttributes) &&
+                    cloud.pointAttributes.find(elem => elem.startsWith('NORMAL'));
+                if (normal) {
+                    this.material.defines[normal] = 1;
+                }
 
-            this.supportsProgressiveDisplay = (this.source.extension === 'cin');
+                this.supportsProgressiveDisplay = (this.source.extension === 'cin');
 
-            this.root = new PotreeNode(0, 0, this);
-            this.root.bbox.min.set(cloud.boundingBox.lx, cloud.boundingBox.ly, cloud.boundingBox.lz);
-            this.root.bbox.max.set(cloud.boundingBox.ux, cloud.boundingBox.uy, cloud.boundingBox.uz);
+                this.root = new PotreeNode(0, 0, this);
+                this.root.bbox.min.set(cloud.boundingBox.lx, cloud.boundingBox.ly, cloud.boundingBox.lz);
+                this.root.bbox.max.set(cloud.boundingBox.ux, cloud.boundingBox.uy, cloud.boundingBox.uz);
 
-            this.extent = Extent.fromBox3(view.referenceCrs, this.root.bbox);
-            return this.root.loadOctree().then(resolve);
-        });
+                this.extent = Extent.fromBox3(view.referenceCrs, this.root.bbox);
+                return this.root.loadOctree().then(resolve);
+            });
+        }
     }
 
     preUpdate(context, changeSources) {
@@ -156,7 +158,7 @@ class PotreeLayer extends GeometryLayer {
         }
 
         // lookup lowest common ancestor of changeSources
-        let commonAncestorName;
+        let commonAncestor;
         for (const source of changeSources.values()) {
             if (source.isCamera || source == this) {
                 // if the change is caused by a camera move, no need to bother
@@ -169,25 +171,20 @@ class PotreeLayer extends GeometryLayer {
             }
             // filter sources that belong to our layer
             if (source.obj.isPoints && source.obj.layer == this) {
-                if (!commonAncestorName) {
-                    commonAncestorName = source.name;
+                if (!commonAncestor) {
+                    commonAncestor = source;
                 } else {
-                    let i;
-                    for (i = 0; i < Math.min(source.name.length, commonAncestorName.length); i++) {
-                        if (source.name[i] != commonAncestorName[i]) {
-                            break;
-                        }
-                    }
-                    commonAncestorName = commonAncestorName.substr(0, i);
-                    if (commonAncestorName.length == 0) {
-                        break;
+                    commonAncestor = source.findCommonAncestor(commonAncestor);
+
+                    if (!commonAncestor) {
+                        return [this.root];
                     }
                 }
             }
         }
 
-        if (commonAncestorName) {
-            return [this.root.getChildByName(commonAncestorName)];
+        if (commonAncestor) {
+            return [commonAncestor];
         }
 
         // Start updating from hierarchy root
@@ -197,7 +194,7 @@ class PotreeLayer extends GeometryLayer {
     update(context, layer, elt) {
         elt.visible = false;
 
-        if (this.octreeDepthLimit >= 0 && this.octreeDepthLimit < elt.name.length) {
+        if (this.octreeDepthLimit >= 0 && this.octreeDepthLimit < elt.depth) {
             markForDeletion(elt);
             return;
         }

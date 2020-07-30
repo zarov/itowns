@@ -12,6 +12,7 @@ class PotreeNode {
         this.children = [];
         this.layer = layer;
         this.name = '';
+        this.depth = 0;
         this.bbox = new THREE.Box3();
         this.sse = -1;
         this.baseurl = layer.source.baseurl;
@@ -21,6 +22,7 @@ class PotreeNode {
         this.children.push(node);
         node.parent = this;
         node.name = this.name + indexChild;
+        node.depth = node.name.length;
         this.createChildAABB(indexChild, node.bbox);
         if ((node.name.length % this.layer.hierarchyStepSize) == 0) {
             node.baseurl = `${root.baseurl}/${node.name.substr(root.name.length)}`;
@@ -67,19 +69,6 @@ class PotreeNode {
         }
     }
 
-    getChildByName(name) {
-        if (this.name === name) {
-            return this;
-        }
-        const charIndex = this.name.length;
-        for (const child of this.children) {
-            if (child.name[charIndex] == name[charIndex]) {
-                return child.getChildByName(name);
-            }
-        }
-        throw new Error(`Cannot find node with name '${name}'`);
-    }
-
     get octreeIsLoaded() {
         return !(this.childrenBitField && this.children.length === 0);
     }
@@ -124,6 +113,20 @@ class PotreeNode {
                 }
             }
         });
+    }
+
+    findCommonAncestor(node) {
+        if (node.depth == this.depth) {
+            if (node.name == this.name) {
+                return node;
+            } else if (node.depth != 0) {
+                return this.parent.findCommonAncestor(node.parent);
+            }
+        } else if (node.depth < this.depth) {
+            return this.parent.findCommonAncestor(node);
+        } else {
+            return this.findCommonAncestor(node.parent);
+        }
     }
 }
 
