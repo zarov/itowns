@@ -1,0 +1,113 @@
+<html>
+    <head>
+        <title>Itowns - Entwine</title>
+
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/example.css">
+        <link rel="stylesheet" type="text/css" href="css/LoadingScreen.css">
+
+        <style type="text/css">
+            #info {
+                color: #7ad7ff;
+                font-family: 'Open Sans', sans-serif;
+                position: absolute;
+                top: 0;
+                left: 0;
+                padding: 0.3rem;
+                background-color: #404040;
+                z-index: 1;
+            }
+            @media (max-width: 600px) {
+                #info,
+                .dg {
+                    display: none;
+                }
+            }
+        </style>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
+    </head>
+    <body>
+        <div id="viewerDiv">
+            <div id="info"></div>
+        </div>
+
+        <script src="../dist/itowns.js"></script>
+        <script src="js/GUI/LoadingScreen.js"></script>
+        <script src="../dist/debug.js"></script>
+        <script type="text/javascript">
+            var debugGui = new dat.GUI();
+            var viewerDiv = document.getElementById('viewerDiv');
+            viewerDiv.style.display = 'block';
+            var view = new itowns.View('EPSG:3946', viewerDiv);
+            view.mainLoop.gfxEngine.renderer.setClearColor(0xcccccc);
+
+            // EPT source
+            var eptSource = new itowns.EntwinePointTileSource({
+                // EPT folder to set here
+                url: 'http://localhost/data-itowns/ES19AGL'
+                //url: 'http://172.20.1.6/ES19AGL',
+                // networkOptions: { mode: 'no-cors' }
+            });
+
+            // EPT layer
+            var eptLayer = new itowns.EntwinePointTileLayer('ES19AGL', {
+                source: eptSource
+            }, view);
+
+            function dblClickHandler(event) {
+                var pick = view.pickObjectsAt(event, 5, eptLayer);
+                var nodes = new Set();
+                pick.forEach(p => nodes.add(p.object.userData.potreeNode));
+                console.log(nodes);
+            }
+            view.domElement.addEventListener('dblclick', dblClickHandler);
+
+            var controls;
+            function onLayerReady() {
+                var camera = view.camera.camera3D;
+
+                var lookAt = new itowns.THREE.Vector3();
+                var size = new itowns.THREE.Vector3();
+                eptLayer.root.bbox.getSize(size);
+                eptLayer.root.bbox.getCenter(lookAt);
+
+                camera.far = 2.0 * size.length();
+
+                var ratio = size.x / size.z;
+
+                var position =
+                    eptLayer.root.bbox.min.clone().add(size.multiply({x: 0, y:
+                        0, z: ratio * 0.5 }));
+                lookAt.z = eptLayer.root.bbox.min.z;
+
+                camera.position.copy(position);
+                camera.lookAt(lookAt);
+
+                /*camera.position.copy(eptSource.center);
+                camera.position.z = 2000;
+                camera.far = 200000;
+
+                camera.rotation.x = 1.2170076062995787;
+                camera.rotation.y = 0.9727503357852995;
+                camera.rotation.z = 0.296244793685114;
+                */
+
+                debug.PotreeDebug.initTools(view, eptLayer, debugGui);
+                controls = new itowns.FirstPersonControls(view, {
+                    focusOnClick: true, moveSpeed: size.length() });
+
+                view.notifyChange(camera);
+
+                // update stats window
+                var info = document.getElementById('info');
+                view.addFrameRequester(itowns.MAIN_LOOP_EVENTS.AFTER_RENDER, () => {
+                    info.textContent = eptLayer.displayedCount.toLocaleString() + ' points';
+                });
+            }
+
+            view.addLayer(eptLayer).then(onLayerReady);
+        </script>
+    </body>
+</html>

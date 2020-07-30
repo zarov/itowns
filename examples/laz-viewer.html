@@ -1,0 +1,68 @@
+<html>
+    <head>
+        <title>Itowns - LAZ drag and drop</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="css/example.css">
+        <link rel="stylesheet" type="text/css" href="css/LoadingScreen.css">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.6/dat.gui.min.js"></script>
+    </head>
+    <body>
+        <div id="viewerDiv">
+            <div id="description">Drag and drop LAZ file</div>
+        </div>
+        <script src="../dist/itowns.js"></script>
+        <script src="js/GUI/LoadingScreen.js"></script>
+        <script type="text/javascript">
+            var viewerDiv = document.getElementById('viewerDiv');
+            var view = new itowns.View('EPSG:3946', viewerDiv);
+            view.mainLoop.gfxEngine.renderer.setClearColor(0xcccccc);
+
+            var fileReader = new FileReader();
+
+            function addFiles(event, files) {
+                event.preventDefault();
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+
+                    fileReader.onload = function onload(e) {
+                        var data = e.target.result;
+
+                        var material = new itowns.PointsMaterial();
+
+                        itowns.LASParser.parse(data, {}).then(function _(geometry) {
+                            console.log(geometry);
+                            var points = new itowns.THREE.Points(geometry, material);
+                            points.frustumCulled = false;
+                            points.matrixAutoUpdate = false;
+                            points.updateMatrix();
+                            view.scene.add(points);
+                            points.updateMatrixWorld(true);
+
+                            var camera = view.camera.camera3D;
+                            camera.far = 2000000;
+                            camera.position.copy(geometry.boundingBox.center());
+                            camera.position.z += 2000;
+                            camera.lookAt(geometry.boundingBox.center());
+
+                            view.notifyChange(camera);
+                        });
+                    };
+
+                    fileReader.readAsArrayBuffer(file);
+                }
+            }
+
+            var controls = new itowns.FirstPersonControls(view, {
+                focusOnClick: true, moveSpeed: 500});
+
+            document.addEventListener('dragenter', function _(e) { e.preventDefault(); }, false);
+            document.addEventListener('dragover', function _(e) { e.preventDefault(); }, false);
+            document.addEventListener('dragleave', function _(e) { e.preventDefault(); }, false);
+            document.addEventListener('drop', function _(e) { addFiles(e, e.dataTransfer.files); }, false);
+            document.addEventListener('paste', function _(e) { addFiles(e, e.clipboardData.files); }, false);
+        </script>
+    </body>
+</html>
+
