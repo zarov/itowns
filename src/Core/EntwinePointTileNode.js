@@ -1,11 +1,13 @@
 import * as THREE from 'three';
+import PointCloudNode from 'Core/PointCloudNode';
 import Fetcher from 'Provider/Fetcher';
 
 const dHalfLength = new THREE.Vector3();
 
-class EntwinePointTileNode {
+class EntwinePointTileNode extends PointCloudNode {
     constructor(depth, x, y, z, layer, numPoints = 0) {
-        this.layer = layer;
+        super(numPoints, layer);
+
         this.isEPTNode = true;
 
         this.depth = depth;
@@ -16,21 +18,6 @@ class EntwinePointTileNode {
         this.id = `${depth}-${x}-${y}-${z}`;
 
         this.url = `${this.layer.source.url}/ept-data/${this.id}.${this.layer.source.extension}`;
-
-        this.numPoints = numPoints;
-
-        this.children = [];
-
-        this.bbox = new THREE.Box3();
-        this.sse = -1;
-    }
-
-    add(node) {
-        this.children.push(node);
-        node.parent = this;
-        // TODO: read this.source.sources to get the corresponding bbox - if it
-        // exists
-        this.createChildAABB(node);
     }
 
     createChildAABB(node) {
@@ -48,14 +35,6 @@ class EntwinePointTileNode {
 
     get octreeIsLoaded() {
         return this.numPoints >= 0;
-    }
-
-    load() {
-        if (!this.octreeIsLoaded) {
-            this.loadOctree();
-        }
-
-        return this.layer.source.fetcher(this.url, this.layer.source.networkOptions).then(this.layer.source.parse);
     }
 
     loadOctree() {
@@ -76,20 +55,6 @@ class EntwinePointTileNode {
                 }
             }
         });
-    }
-
-    findCommonAncestor(node) {
-        if (node.depth == this.depth) {
-            if (node.id == this.id) {
-                return node;
-            } else if (node.depth != 0) {
-                return this.parent.findCommonAncestor(node.parent);
-            }
-        } else if (node.depth < this.depth) {
-            return this.parent.findCommonAncestor(node);
-        } else {
-            return this.findCommonAncestor(node.parent);
-        }
     }
 
     findParent(depth, x, y, z) {
