@@ -12,10 +12,10 @@ class PointCloudNode extends THREE.EventDispatcher {
         this.sse = -1;
     }
 
-    add(node) {
+    add(node, indexChild) {
         this.children.push(node);
         node.parent = this;
-        this.createChildAABB(node);
+        this.createChildAABB(node, indexChild);
     }
 
     load() {

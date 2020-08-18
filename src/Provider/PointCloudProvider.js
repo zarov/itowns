@@ -36,12 +36,13 @@ export default {
             addPickingAttribute(points);
             points.frustumCulled = false;
             points.matrixAutoUpdate = false;
-            // FIXME: how to avoid that ?
+            // FIXME: how to avoid that ? This provider should not be concerned
+            // by specific point cloud type
             if (!layer.isEntwinePointTileLayer) {
                 points.position.copy(node.bbox.min);
                 points.scale.copy(layer.scale);
+                points.updateMatrix();
             }
-            points.updateMatrix();
             points.tightbbox = geometry.boundingBox.applyMatrix4(points.matrix);
             points.layers.set(layer.threejsLayer);
             points.layer = layer;

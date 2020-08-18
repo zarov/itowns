@@ -16,11 +16,9 @@ class PotreeNode extends PointCloudNode {
     }
 
     add(node, indexChild, root) {
-        super.add(node);
+        super.add(node, indexChild);
         node.id = this.id + indexChild;
         node.depth = node.id.length;
-        // FIXME: remove this call
-        this.createChildAABB(node, indexChild);
         if ((node.id.length % this.layer.hierarchyStepSize) == 0) {
             node.baseurl = `${root.baseurl}/${node.id.substr(root.id.length)}`;
         } else {
