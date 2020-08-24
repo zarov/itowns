@@ -98,8 +98,8 @@ class FirstPersonControls extends THREE.EventDispatcher {
             view.domElement.addEventListener('touchmove', this.onMouseMove.bind(this), false);
             view.domElement.addEventListener('mouseup', this.onMouseUp.bind(this), false);
             view.domElement.addEventListener('touchend', this.onMouseUp.bind(this), false);
-            view.domElement.addEventListener('keyup', this.onKeyUp.bind(this), true);
-            view.domElement.addEventListener('keydown', this.onKeyDown.bind(this), true);
+            window.addEventListener('keyup', this.onKeyUp.bind(this), true);
+            window.addEventListener('keydown', this.onKeyDown.bind(this), true);
             view.domElement.addEventListener('mousewheel', this.onMouseWheel.bind(this), false);
             view.domElement.addEventListener('DOMMouseScroll', this.onMouseWheel.bind(this), false); // firefox
         }
