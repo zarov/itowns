@@ -52,6 +52,7 @@ export { default as ColorLayersOrdering } from 'Renderer/ColorLayersOrdering';
 export { default as GlobeLayer } from 'Core/Prefab/Globe/GlobeLayer';
 export { default as PlanarLayer } from 'Core/Prefab/Planar/PlanarLayer';
 export { default as LabelLayer } from 'Layer/LabelLayer';
+export { default as EntwinePointTileLayer } from 'Layer/EntwinePointTileLayer';
 
 // Sources provided by default in iTowns
 // A custom source should at least implements Source
@@ -66,6 +67,7 @@ export { default as VectorTilesSource } from 'Source/VectorTilesSource';
 export { default as OrientedImageSource } from 'Source/OrientedImageSource';
 export { default as PotreeSource } from 'Source/PotreeSource';
 export { default as C3DTilesSource } from 'Source/C3DTilesSource';
+export { default as EntwinePointTileSource } from 'Source/EntwinePointTileSource';
 
 // Parsers provided by default in iTowns
 // Custom parser can be implemented as wanted, as long as the main function
