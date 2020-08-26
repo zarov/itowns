@@ -116,9 +116,26 @@ export default {
             b3dmHeader.BTBinaryLength = view.getUint32(byteOffset, true);
             byteOffset += Uint32Array.BYTES_PER_ELEMENT;
 
+            let FTJSON = {};
+            // Legacy check https://github.com/CesiumGS/cesium/blob/8363cf6519c56d97603a3e997058d0134790b04f/Source/Scene/Batched3DModel3DTileContent.js#L261-L291
+            if (b3dmHeader.BTJSONLength > 570425344) {
+                byteOffset -= Uint32Array.BYTES_PER_ELEMENT * 2;
+                FTJSON.BATCH_LENGTH = b3dmHeader.FTJSONLength;
+                b3dmHeader.BTJSONLength = b3dmHeader.FTJSONLength;
+                b3dmHeader.FTJSONLength = 0;
+                b3dmHeader.FTBinaryLength = 0;
+                b3dmHeader.BTBinaryLength = 0;
+            } else if (b3dmHeader.BTBinaryLength > 570425344) {
+                byteOffset -= Uint32Array.BYTES_PER_ELEMENT;
+                FTJSON.BATCH_LENGTH = b3dmHeader.BTJSONLength;
+                b3dmHeader.BTJSONLength = b3dmHeader.FTJSONLength;
+                b3dmHeader.BTBinaryLength = b3dmHeader.FTBinaryLength;
+                b3dmHeader.FTJSONLength = 0;
+                b3dmHeader.FTBinaryLength = 0;
+            }
+
             const headerByteLength = byteOffset + magicNumberByteLength;
             const promises = [];
-            let FTJSON = {};
             const FT_RTC = new THREE.Vector3();
             if (b3dmHeader.FTJSONLength > 0) {
                 const sizeBegin = headerByteLength;
