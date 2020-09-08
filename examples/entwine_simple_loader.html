@@ -58,6 +58,7 @@
                 camera.lookAt(lookAt);
 
                 controls.options.moveSpeed = size.length();
+                debugGui.__controllers[0].updateDisplay();
 
                 view.notifyChange(camera);
                 controls.reset();

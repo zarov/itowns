@@ -311,7 +311,7 @@ class PointCloudLayer extends GeometryLayer {
         const now = Date.now();
         for (let i = this.group.children.length - 1; i >= 0; i--) {
             const obj = this.group.children[i];
-            if (!obj.material.visible && (now - obj.userData.node.notVisibleSince) > 10000) {
+            if (!obj.material.visible && (now - obj.userData.node.notVisibleSince) > 60) {
                 // remove from group
                 this.group.children.splice(i, 1);
 
