@@ -38,6 +38,7 @@
             view.mainLoop.gfxEngine.renderer.setClearColor(0xcccccc);
 
             var controls = new itowns.FirstPersonControls(view, { focusOnClick: true });
+            debugGui.add(controls.options, 'moveSpeed', 1, 10000).name('Movement speed');
 
             var eptLayer, eptSource;
 
@@ -90,7 +91,20 @@
 
                 view.addLayer(eptLayer).then(onLayerReady);
 
-                debug.PointCloudDebug.initTools(view, eptLayer, debugGui);
+                debug.PotreeDebug.initTools(view, eptLayer, debugGui);
+
+                function dblClickHandler(event) {
+                    var pick = view.pickObjectsAt(event, 5, eptLayer);
+
+                    for (const p of pick) {
+                        console.info('Selected point #' + p.index + ' in position (' +
+                            p.object.position.x + ', ' +
+                            p.object.position.y + ', ' +
+                            p.object.position.z +
+                         ') - node ' + p.object.userData.node.id);
+                    }
+                }
+                view.domElement.addEventListener('dblclick', dblClickHandler);
             }
 
             function loadGrandLyon() {

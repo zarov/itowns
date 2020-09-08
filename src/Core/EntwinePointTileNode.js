@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import Fetcher from 'Provider/Fetcher';
 
-const dHalfLength = new THREE.Vector3();
+const size = new THREE.Vector3();
+const position = new THREE.Vector3();
+const translation = new THREE.Vector3();
 
 class EntwinePointTileNode {
     constructor(depth, x, y, z, layer, numPoints = 0) {
@@ -34,16 +36,32 @@ class EntwinePointTileNode {
     }
 
     createChildAABB(node) {
-        const divideFactor = 2 ** (node.depth - this.depth);
-        dHalfLength.copy(this.bbox.max).sub(this.bbox.min).divideScalar(divideFactor);
+        // factor to apply, based on the depth difference (can be > 1)
+        const f = 2 ** (node.depth - this.depth);
 
-        node.bbox.min.copy(dHalfLength);
-        node.bbox.min.x *= node.x;
-        node.bbox.min.y *= node.y;
-        node.bbox.min.z *= node.z;
-        node.bbox.min.add(this.bbox.min);
+        // size of the child node bbox (Vector3), based on the size of the
+        // parent node, and divided by the factor
+        this.bbox.getSize(size).divideScalar(f);
 
-        node.bbox.max.copy(node.bbox.min).add(dHalfLength);
+        // initialize the child node bbox at the location of the parent node bbox
+        node.bbox.min.copy(this.bbox.min);
+
+        // position of the parent node, if it was at the same depth than the
+        // child, found by multiplying the tree position by the factor
+        position.copy(this).multiplyScalar(f);
+
+        // difference in position between the two nodes, at child depth, and
+        // scale it using the size
+        translation.subVectors(node, position).multiply(size);
+
+        // apply the translation to the child node bbox
+        node.bbox.min.add(translation);
+
+        // use the size computed above to set the max
+        node.bbox.max.copy(node.bbox.min).add(size);
+
+
+        // TODO: probleme avec le Z et les sous hierarchy
     }
 
     get octreeIsLoaded() {
@@ -62,18 +80,24 @@ class EntwinePointTileNode {
         return Fetcher.json(`${this.layer.source.url}/ept-hierarchy/${this.id}.json`, this.layer.source.networkOptions).then((hierarchy) => {
             this.numPoints = hierarchy[this.id];
 
-            for (const id in hierarchy) {
-                if (id != this.id) {
-                    const [depth, x, y, z] = id.split('-').map(c => parseInt(c, 10));
-                    const node = new EntwinePointTileNode(depth, x, y, z, this.layer, hierarchy[id]);
-                    const parent = this.findParent(
-                        depth - 1,
-                        Math.floor(x / 2),
-                        Math.floor(y / 2),
-                        Math.floor(z / 2),
-                    );
-                    parent.add(node);
-                }
+            const stack = [];
+            stack.push(this);
+
+            while (stack.length) {
+                const node = stack.shift();
+                const depth = node.depth + 1;
+                const x = node.x * 2;
+                const y = node.y * 2;
+                const z = node.z * 2;
+
+                node.findAndCreateChild(depth, x,     y,     z,     hierarchy, stack);
+                node.findAndCreateChild(depth, x + 1, y,     z,     hierarchy, stack);
+                node.findAndCreateChild(depth, x,     y + 1, z,     hierarchy, stack);
+                node.findAndCreateChild(depth, x + 1, y + 1, z,     hierarchy, stack);
+                node.findAndCreateChild(depth, x,     y,     z + 1, hierarchy, stack);
+                node.findAndCreateChild(depth, x + 1, y,     z + 1, hierarchy, stack);
+                node.findAndCreateChild(depth, x,     y + 1, z + 1, hierarchy, stack);
+                node.findAndCreateChild(depth, x + 1, y + 1, z + 1, hierarchy, stack);
             }
         });
     }
@@ -92,16 +116,14 @@ class EntwinePointTileNode {
         }
     }
 
-    findParent(depth, x, y, z) {
-        if (this.depth == depth && this.x == x && this.y == y && this.z == z) {
-            return this;
-        } else if (this.children.length > 0) {
-            for (let i = 0; i < this.children.length; i++) {
-                const parent = this.children[i].findParent(depth, x, y, z);
-                if (parent) {
-                    return parent;
-                }
-            }
+    findAndCreateChild(depth, x, y, z, hierarchy, stack) {
+        const id = `${depth}-${x}-${y}-${z}`;
+        const numPoints = hierarchy[id];
+
+        if (typeof numPoints == 'number') {
+            const child = new EntwinePointTileNode(depth, x, y, z, this.layer, numPoints);
+            this.add(child);
+            stack.push(child);
         }
     }
 }
