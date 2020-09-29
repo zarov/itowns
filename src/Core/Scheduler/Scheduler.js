@@ -153,7 +153,7 @@ Scheduler.prototype.execute = function execute(command) {
 
     // parse host
     const layer = command.layer;
-    const host = layer.source && layer.source.url ? new URL(layer.source.url, document.location).host : undefined;
+    const host = layer.source && layer.source.url ? new URL(layer.source.url.replace(/\$\{u:([\w-_.|]+)\}/, ''), document.location).host : undefined;
 
     command.promise = new Promise((resolve, reject) => {
         command.resolve = resolve;
