@@ -2,6 +2,7 @@ import Source from 'Source/Source';
 import Fetcher from 'Provider/Fetcher';
 import PotreeBinParser from 'Parser/PotreeBinParser';
 import PotreeCinParser from 'Parser/PotreeCinParser';
+import LASParser from 'Parser/LASParser';
 
 /**
  * @classdesc
@@ -78,11 +79,33 @@ class PotreeSource extends Source {
         // https://github.com/PropellerAero/potree-propeller-private/blob/master/docs/file_format.md#cloudjs
         this.whenReady = (source.cloud ? Promise.resolve(source.cloud) : Fetcher.json(`${this.url}/${this.file}`, this.networkOptions))
             .then((cloud) => {
-                this.baseurl = `${this.url}/${cloud.octreeDir}/r`;
-                this.extension = cloud.pointAttributes === 'CIN' ? 'cin' : 'bin';
-                this.parse = this.extension === 'cin' ?
-                    buffer => PotreeCinParser.parse(buffer) :
-                    buffer => PotreeBinParser.parse(buffer, cloud.pointAttributes);
+                switch (cloud.pointAttributes) {
+                    case 'CIN':
+                        this.extension = 'cin';
+                        this.parse = buffer => PotreeCinParser.parse(buffer);
+                        break;
+                    case 'LAS':
+                        this.extension = 'las';
+                        this.parse = buffer => LASParser.parse(buffer);
+                        break;
+                    case 'LAZ':
+                        this.extension = 'laz';
+                        this.parse = buffer => LASParser.parse(buffer);
+                        break;
+                    default:
+                        this.extension = 'bin';
+                        this.parse = buffer => PotreeBinParser.parse(buffer, cloud.pointAttributes);
+                        break;
+                }
+
+                if (cloud.hierarchy) {
+                    // eslint-ignore-next-line
+                    console.warn('hierarchy property in Potree is deprecated - see potree documentation');
+                    this.hierarchy = new Map(cloud.hierarchy);
+                    this.baseurl = `${this.url}/${cloud.octreeDir}`;
+                } else {
+                    this.baseurl = `${this.url}/${cloud.octreeDir}/r`;
+                }
 
                 return cloud;
             });

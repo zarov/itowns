@@ -57,10 +57,10 @@
                 view.mainLoop.gfxEngine.renderer.setClearColor(0xcccccc);
 
                 // Configure Point Cloud layer
-                potreeLayer = new itowns.PotreeLayer('eglise_saint_blaise_arles', {
+                potreeLayer = new itowns.PotreeLayer('Takanawa Lion', {
                     source: new itowns.PotreeSource({
-                        file: 'eglise_saint_blaise_arles.js',
-                        url: 'https://raw.githubusercontent.com/iTowns/iTowns2-sample-data/master/pointclouds/eglise_saint_blaise_arles',
+                        file: 'cloud.js',
+                        url: 'https://raw.githubusercontent.com/potree/potree/develop/pointclouds/lion_takanawa_las',
                         crs: view.referenceCrs,
                     }),
                 });

@@ -73,6 +73,32 @@ class PotreeNode extends PointCloudNode {
     }
 
     loadOctree() {
+        const hr = this.layer.source.hierarchy;
+        if (hr) {
+            const stack = [this];
+            let nodeCount = 0;
+
+            this.childrenBitField = 0;
+            this.numPoints = hr.get(`r${this.id}`);
+
+            while (stack.length && nodeCount <= hr.size) {
+                const snode = stack.shift();
+
+                // look up 8 children
+                for (let indexChild = 0; indexChild < 8; indexChild++) {
+                    const numPointsChild = hr.get(`r${this.id}${indexChild}`);
+                    if (numPointsChild) {
+                        const item = new PotreeNode(numPointsChild, 0, this.layer);
+                        snode.add(item, indexChild, this);
+                        stack.push(item);
+                        nodeCount++;
+                    }
+                }
+            }
+
+            return Promise.resolve();
+        }
+
         const octreeUrl = `${this.baseurl}/r${this.id}.${this.layer.source.extensionOctree}`;
         return this.layer.source.fetcher(octreeUrl, this.layer.source.networkOptions).then((blob) => {
             const view = new DataView(blob);
